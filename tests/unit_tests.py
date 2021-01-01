@@ -1,5 +1,5 @@
 #run all unit tests, dispaying results to the command prompt
-from main import Main
+from 
 import time
 
 class Unit_Tests:
