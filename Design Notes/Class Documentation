@@ -1,0 +1,113 @@
+Main
+	purpose:
+		instantiates the graphics class
+		instantiates the physics class
+		instantiates the camera class
+		instantiates the storage class
+		instantiages the sound class
+		uses the terrain generation class
+		moves data between sub classes
+		accepts control input (mouse, keyboard, controller)
+		parses input?
+		calls the draw command (from the graphics class)
+		core game loop
+		calculates and displays fps
+		initiates the application
+	other classes used:
+		physics: uses it to perform block updates, check camera / world collsion, access / update block data
+		graphics: uses it generate meshes and give them to the gpu
+		camera: uses it to manage and update the view matrix and parse camera controls
+		sound: uses it to play and manage sounds
+		storage: used to read settings and worlds data from storage
+	io:
+		accepts keyboard / mouse input
+		provides the game window and sounds
+
+Physics
+	purpose:
+		calculate physics of the world, this includes entity/world collision and world block updates
+		is given the cordinates of the camera each tick, it check collision and provides the new camera pos if there is a collision
+		holds all block data as 3D array (numpy)
+		used to update / read block data
+	other classes used:
+		none
+	io:
+		accepts block data to store (this class does not generate block data)
+		accepts camera cordinates
+		accepts update commands to block data
+		provides block data (main class can read block data from this class)
+		provides new camera cordinates after collision detection and correction
+
+Graphics
+	purpose:
+		generate meshes from physics class' data
+		manages mesh data updates and memeory on the gpu
+		wraps opengl api
+	other classes used:
+		vao: uses it to generate and manage vertex array objects in opengl
+	io:
+		accepts block data from the physics class
+		accepts window size from the main class
+		provides vertex array to the gpu (via opengl api)
+
+Camera
+	purpose:
+		to manage the view matrix
+		accepts input from the main class, calculates the new view matrix
+		keeps track of camera's position within the world
+	other classes used:
+		none
+	io:
+		accepts 6DoF commands to update the view matrix, from the main class
+		provides an updated (per tick) view matrix
+
+Sound
+	purpose:
+		load sounds from files
+		keep track of sounds
+		play sounds on command
+	other classes used:
+		none
+	io:
+		accepts sound files from the storage device
+		accepts commands to play sounds
+		provides sounds
+
+Blocks
+	purpose:
+		keeping track of unique block type data and tying them to block ids
+		mapping block faces to the texture atlas
+	other classes used:
+		none
+	io:
+		accepts new unique block info from the main class (may be generated in a game class?)
+		accepts the texture atlas size
+		provides unique block data
+
+Vao
+	purpose:
+		contains logic to create a vao within opengl easily
+	other classes used:
+		none
+	io:
+		accepts opengl commands from the graphics class to create and manage vao's
+		provides settings info on vao's
+
+Storage
+	purpose:
+		read/write world/entity/player data from/to disk
+	other classes used:
+		none
+	io:
+		accepts input from the storage device
+		provides settings, world data and player data
+
+Terrain Generator
+	purpose:
+		holds the many algorithms for generating terrain
+	other classes used:
+		none
+	io:
+		accepts meta-parameters for terrain generation
+		provides block data to the physics class
+
