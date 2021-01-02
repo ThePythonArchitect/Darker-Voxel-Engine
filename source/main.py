@@ -1,11 +1,13 @@
 """
 
-Main class.  Start the application and initializes all other classes.
+Main class
+Starts the application and initializes all other classes.
 
 """
 
-
 import pyglet
+from camera import Camera
+
 
 class Main:
 
@@ -24,19 +26,36 @@ class Main:
             caption = title,
             fullscreen = False,
             resizable = False,
-            vsync = True
+            vsync = False
             )
+
+        #manually call the @window.event decorator
+        #this makes the self.on_draw function be called
+        #everytime pyglet re-draws the screen
+        self.on_draw = self.window.event(self.on_draw)
+
+        #instantiate other classes
+        self.camera = Camera()
+
+        return
+
+    def on_draw(self):
+
+        #render the frame to the screen
 
         return
 
     def update_fps(self, dt):
 
         #update the window title with the new fps
-        self.window.set_caption(f"{self.title} - FPS: {pyglet.clock.get_fps()}")
+        self.window.set_caption(f"{self.title} - FPS: {int(pyglet.clock.get_fps())}")
 
         return
 
     def update(self, dt):
+
+        #this is called to update the game state
+        #if tps is 60, then it is called 60 times per second
 
         return
 
@@ -47,6 +66,10 @@ class Main:
 
         #set the update to be called X times per second
         pyglet.clock.schedule_interval(self.update, (1/self.tps))
+
+        #run the application; pyglet doesn't render anything until
+        #this command is called
+        pyglet.app.run()
 
         return
 

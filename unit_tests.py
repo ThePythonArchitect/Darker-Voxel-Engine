@@ -1,19 +1,17 @@
 #run all unit tests, dispaying results to the command prompt
-from source import main
-import time
+from source.main import Main
 
 class Unit_Tests:
 
     def __init__(self):
         
-        self.total_tests = 1
+        self.total_tests = 2
         self.total_fails = 0
 
         #create test object once here then call it from the unit test methods
         self.test_main = Main()
         #start the application
         self.test_main.start()
-        time.sleep(3)
 
         return
 
@@ -24,6 +22,7 @@ class Unit_Tests:
 
         #call unit test methods from here
         self.total_fails += self.test_main_init()
+        self.total_fails += self.test_camera()
 
 
         #display results here
@@ -77,6 +76,15 @@ class Unit_Tests:
             result = 1
 
         return result
+
+    def test_camera(self):
+
+        #0 = pass, 1 = fail
+        result = 0
+
+
+
+        return
 
 if __name__ == "__main__":
     unit_tests = Unit_Tests()
