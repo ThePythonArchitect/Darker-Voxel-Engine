@@ -111,3 +111,7 @@ Terrain Generator
 		accepts meta-parameters for terrain generation
 		provides block data to the physics class
 
+
+keep track of which slots are being used, which are empty
+track what quad is in which memory slot
+[q, q, q, q, q, q, q, 0, 0, q, q]
