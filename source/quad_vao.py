@@ -4,11 +4,11 @@ This class is a wrapper around vertex array objects.
 It is used specifically to create quad surfaces on the GPU.
 Vertex attribute:
     (x, y, z) spacial cordinates (4 bytes + 4 bytes + 4 bytes)
-    (u, v) texture cordinates (2 bytes + 2 bytes)
-    (i) lighting (1 byte)
-    21 bytes total
-    1 MB can fit 49,932 vertices
-    which totals 12,483 quads
+    (u, v) texture cordinates (4 bytes + 4 bytes)
+    (i) lighting (4 byte)
+    24 bytes total
+    1 MB can fit 43,690 vertices
+    which totals 10,922 quads
 
 """
 
@@ -97,19 +97,26 @@ class Quad_Vao:
 
         return
 
-    def define_vertex_layout(self, byte_count, location, id):
+    def define_vertex_layout(self, number_of_values, data_type, location, offset, id):
 
         #defines how the data will be defined in the VAO
         #
         ##Parameter 1:
-        #the number of bytes that are provided with the current attribute
+        #the number of values that are provided with the current attribute
         #for instance, if the position is defined in 3D space, that requires
-        #3 floats, therefore byte_count would equal 12 (3 * 4).
+        #3 floats, therefore byte_count would equal 3.
         #
         #Parameter 2:
-        #the location that is defined in the vertex shader
+        #the gl datatype of the given attribute (ie gl.GL_FLOAT or gl.GL_UNSIGNED_INT)
         #
         #Parameter 3:
+        #the location that is defined in the vertex shader
+        #
+        #Parameter 4:
+        #how many bytes into the buffer to begin reading
+        #for this attribute
+        #
+        #Parameter 5:
         #the id of the target vertex buffer
         #
         #Returns nothing.
@@ -121,26 +128,7 @@ class Quad_Vao:
 
         #set the buffer that we just created as the primary
         #vertex buffer in the openGL context
-        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertex_buffer_id)
-
-        #TODO
-        #redo this logic to make it more dynamic
-        #right now, it can only allocate all memory once, then it becomes
-        #pointless, also it doesn't check for trying to add data that exceeds
-        #the memory allocated, which leads to errors pretty often
-
-        #the self.offsets dictionary keep track of the previous locations'
-        #stride.  The current locations offset should be a sum of all the
-        #previous locations strides.
-        previous_sum = sum(x for x in self.offsets.values())
-        self.offsets[location] = number_of_values + previous_sum
-        if location == 0:
-            #make a pointer to the number 0
-            offset = 0
-        else:
-            #create a pointer to the offset
-            #offset = ctypes.c_float(self.offsets[location-1])
-            offset = self.offsets[location-1] * self.float_length
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, id)
 
         #enable the attribute before we define it
         gl.glEnableVertexAttribArray(location)
@@ -149,11 +137,93 @@ class Quad_Vao:
         gl.glVertexAttribPointer(
             location,
             number_of_values,
-            gl.GL_FLOAT,
+            datatype,
             gl.GL_FALSE,
             self.vertex_stride,
             ctypes.c_void_p(offset)
         )
+
+        #unbind the vertex buffer
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)
+
+        return
+
+    def allocate_vertex_buffer(self, id, draw_type=gl.GL_STATIC_DRAW):
+
+        #alloctes space on the vertex buffer on the GPU
+        #
+        #Parameter 1:
+        #the id of the target vertex buffer
+        #
+        #Parameter 2:
+        #the type of drawing mode openGL should use for the data
+        #
+        #returns nothing
+
+        #bind the vertex buffer of the given id
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertex_buffer_id)
+        
+        gl.glBufferData(
+            gl.GL_ARRAY_BUFFER,
+            self.memory_size,
+            0,
+            self.draw_types[draw_type]
+        )
+
+        #unbind the target vertex buffer
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)
+
+        return
+
+    def upload_vertex_data(self, c_array):
+
+        #uploads data into the vertex buffer on the GPU
+        #
+        #Parameter 1:
+        #a 1 dimensional array of data in a c array format
+        #
+        #returns nothing
+        
+        #vertex buffer in the openGL context
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertex_buffer_id)
+
+        #self.vertex_buffer_offset determines the starting address
+        #that the array will be placed in the GPU's vertex buffer
+        gl.glBufferSubData(
+            gl.GL_ARRAY_BUFFER,
+            self.vertex_buffer_offset,
+            sizeof(c_array),
+            c_array
+        )
+        #set the new offset to be the next empty address
+        #self.vertex_buffer_offset += sizeof(c_array)
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)
+
+        return
+
+    def draw(self, count, id):
+
+        #draw from the vertex buffer
+        #
+        #Parameter 1:
+        #the amount of vertices in the vertex buffer to draw
+        #
+        #Parameter 2:
+        #the id of the target vertex buffer to draw from
+        #
+        #returns nothing
+
+        #convert the count variable to a ctype
+        c_count = ctypes.c_int(count)
+
+        #bind the target vertex buffer
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, id)
+
+        #now the draw commond from opengl
+        gl.glDrawArrays(
+            gl.GL_QUADS,
+            0,
+            c_count,
+            )
 
         return
