@@ -1,7 +1,9 @@
 """
 
-This class is a wrapper around vertex array objects.
+This class is a wrapper around vertex array object
+.
 It is used specifically to create quad surfaces on the GPU.
+
 Vertex attribute:
     (x, y, z) spacial cordinates (4 bytes + 4 bytes + 4 bytes)
     (u, v) texture cordinates (4 bytes + 4 bytes)
@@ -24,6 +26,7 @@ class Quad_Vao:
         #memory size is how much video memory is allocated
         #to this vao.  size is in MB
         #1,048,576 is how many bytes are in a MB
+        #so now memory size represents how many bytes are to be allocated
         self.memory_size = memory_size * 1048576
 
         #create an id from openGL
@@ -50,18 +53,18 @@ class Quad_Vao:
 
         return
 
-    def bind_vao(self):
+    def bind_vao(self, id):
 
         #proper openGL etiquette to bind the vao before each operation
         #then unbind afterwards.  it also helps avoid weird bugs
-        gl.glBindVertexArray(self.vertex_array_id)
+        gl.glBindVertexArray(id)
 
         return
 
     def unbind_vao(self):
 
         #proper openGL etiquette to bind the vao before each operation
-        #then unbind afterwards.  it also helps avoid weird bugs
+        #then unbind afterwards.  it also helps avoid weird bugs test
         gl.glBindVertexArray(0)
 
         return
@@ -161,7 +164,7 @@ class Quad_Vao:
         #returns nothing
 
         #bind the vertex buffer of the given id
-        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertex_buffer_id)
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, id)
         
         gl.glBufferData(
             gl.GL_ARRAY_BUFFER,
@@ -175,24 +178,31 @@ class Quad_Vao:
 
         return
 
-    def upload_vertex_data(self, c_array):
+    def upload_vertex_data(self, array, datatype):
 
         #uploads data into the vertex buffer on the GPU
         #
         #Parameter 1:
-        #a 1 dimensional array of data in a c array format
+        #a 1 dimensional array of data
+        #
+        #Parameter 2:
+        #the ctypes data type of the given array
         #
         #returns nothing
         
         #vertex buffer in the openGL context
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertex_buffer_id)
 
+        #convert the array to a c array
+        #otherwise opengl wont accept it
+        c_array = (datatype * len(array))(*array)
+
         #self.vertex_buffer_offset determines the starting address
         #that the array will be placed in the GPU's vertex buffer
         gl.glBufferSubData(
             gl.GL_ARRAY_BUFFER,
             self.vertex_buffer_offset,
-            sizeof(c_array),
+            ctypes.sizeof(c_array),
             c_array
         )
         #set the new offset to be the next empty address
