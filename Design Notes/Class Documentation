@@ -27,23 +27,23 @@ Physics
 	purpose:
 		calculate physics of the world, this includes entity/world collision and world block updates
 		is given the cordinates of the camera each tick, it check collision and provides the new camera pos if there is a collision
-		holds all block data as 3D array (numpy)
-		used to update / read block data
+		used to update / read block data from world cords
+		keeps a list of sectors which then stores blocks
 	other classes used:
 		none
 	io:
-		accepts block data to store (this class does not generate block data)
 		accepts camera cordinates
 		accepts update commands to block data
+
 		provides block data (main class can read block data from this class)
 		provides new camera cordinates after collision detection and correction
 
 Graphics
 	purpose:
-		generate meshes from physics class' data
 		manages mesh data updates and memeory on the gpu
 		wraps opengl api
 	other classes used:
+		sector: uses it to generate meshes
 		vao: uses it to generate and manage vertex array objects in opengl
 	io:
 		accepts block data from the physics class
@@ -84,14 +84,26 @@ Blocks
 		accepts the texture atlas size
 		provides unique block data
 
-Vao
+Quad_Vao
 	purpose:
 		contains logic to create a vao within opengl easily
+		this vao will be used exclusively to generate quads for greedy meshing the environment
 	other classes used:
 		none
 	io:
 		accepts opengl commands from the graphics class to create and manage vao's
 		provides settings info on vao's
+
+Sector:
+	purpose:
+		stores block data
+		generates mesh for itself
+	other classes used:
+		none
+	io:
+		accepts block data from the physics class for block interactions
+		accepts block data from terrain generator for the initial generation of blocks
+		
 
 Storage
 	purpose:
@@ -100,7 +112,7 @@ Storage
 		none
 	io:
 		accepts input from the storage device
-		provides settings, world data and player data
+		provides settings, world and player data
 
 Terrain Generator
 	purpose:
@@ -112,10 +124,7 @@ Terrain Generator
 		provides block data to the physics class
 
 
-keep track of which slots are being used, which are empty
-track what quad is in which memory slot
-[q, q, q, q, q, q, q, 0, 0, q, q]
 
-vertex list would like something like...
-[x, y, z, u, v, l]
-[f, f, f, f, f, f]
+player tries to move forward
+check if block is in the way
+	physics.block_at(x, y, z)

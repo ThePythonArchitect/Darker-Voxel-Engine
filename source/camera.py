@@ -64,7 +64,8 @@ class Camera:
         self.enable_roll = False
 
         #this is only used if enabled_roll is set to False
-        #it controlls how far the camera can look up and down, max it like 2.6?
+        #it controlls how far the camera can look up and down, max it like pi/2 for
+        #preventing the camera from looking straight up and down
         self.camera_lock_value = 1.75
 
         #controls if moving the mouse up turns the camera up or down

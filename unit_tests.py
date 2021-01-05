@@ -82,6 +82,7 @@ class Unit_Tests:
         #0 = pass, 1 = fail
         result = 0
 
+        #test the parse strafe input function?
 
 
         return
