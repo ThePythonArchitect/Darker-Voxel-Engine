@@ -127,4 +127,4 @@ Terrain Generator
 
 player tries to move forward
 check if block is in the way
-	physics.block_at(x, y, z)
+	physics.block_at(x, y, z) : true / false

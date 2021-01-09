@@ -19,6 +19,8 @@ from pyglet import gl
 import ctypes
 import numpy
 
+
+
 class Quad_Vao:
 
     def __init__(self, memory_size=512):
@@ -178,9 +180,10 @@ class Quad_Vao:
 
         return
 
-    def upload_vertex_data(self, array, datatype):
+    def upload_vertex_data(self, array, datatype=gl.GL_FLOAT):
 
         #uploads data into the vertex buffer on the GPU
+        #this syncs the CPU and GPU
         #
         #Parameter 1:
         #a 1 dimensional array of data
@@ -216,7 +219,7 @@ class Quad_Vao:
         #draw from the vertex buffer
         #
         #Parameter 1:
-        #the amount of vertices in the vertex buffer to draw
+        #the amount of quads in the vertex buffer to draw
         #
         #Parameter 2:
         #the id of the target vertex buffer to draw from
@@ -224,7 +227,9 @@ class Quad_Vao:
         #returns nothing
 
         #convert the count variable to a ctype
-        c_count = ctypes.c_int(count)
+        #multiplied by 4 since we are drawing quads
+        #1 quad = 4 vertices
+        c_count = ctypes.c_int(count * 4)
 
         #bind the target vertex buffer
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, id)

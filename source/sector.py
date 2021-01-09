@@ -31,5 +31,11 @@ class Sector:
     def generate_mesh(self):
 
         #generate a greedy mesh for this sector
+        #needs to return a list of floats that represent the vertices
+        #for this sector
+        #
+        #format:
+        #[x, y, z, u, v, i]
+        #group vertices into 4, to represent quad surface
 
         return
